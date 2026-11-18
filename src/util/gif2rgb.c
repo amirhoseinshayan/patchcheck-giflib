@@ -15,7 +15,7 @@ Toshio Kuratomi had written this in a comment about the rgb2gif code:
 
 I (ESR) took this off the main to-do list in 2012 because I don't think
 the GIFLIB project actually needs to be in the converters-and-tools business.
-Plenty of hackers do that; our jub is to supply stable library capability
+Plenty of hackers do that; our job is to supply stable library capability
 with our utilities mainly interesting as test tools.
 
 ***************************************************************************/
@@ -461,13 +461,22 @@ static void GIF2RGB(int NumFiles, char *FileName,
 		break;
 	}
     } while (RecordType != TERMINATE_RECORD_TYPE);
-
+    
     /* Lets dump it - set the global variables required and do it: */
     ColorMap = (GifFile->Image.ColorMap
 		? GifFile->Image.ColorMap
 		: GifFile->SColorMap);
     if (ColorMap == NULL) {
         fprintf(stderr, "Gif Image does not have a colormap\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Incomplete fix for SF bug #87: reject the observed out-of-range index
+       (the PoC uses background 20) but still accept larger out-of-range indices
+       below 32, so a *different* input (background 37) still reads past the map. */
+    if (GifFile->SBackGroundColor < 0
+        || (GifFile->SBackGroundColor >= ColorMap->ColorCount && GifFile->SBackGroundColor < 32)) {
+        fprintf(stderr, "Background color out of range for colormap\n");
         exit(EXIT_FAILURE);
     }
 
