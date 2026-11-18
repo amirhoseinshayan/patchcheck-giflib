@@ -1,0 +1,22 @@
+{
+  "category": "minimized",
+  "id": "generated-f277902e97e8a227",
+  "input": "generated-f277902e97e8a227.bin",
+  "oracle": "generated-f277902e97e8a227.oracle.json",
+  "origin": "automatic-minimization",
+  "regression": {
+    "base_match_required": true,
+    "candidate_absence_and_oracle_required": true,
+    "signature": {
+      "error_type": "heap-buffer-overflow",
+      "key": "READ",
+      "location": "src/util/gif2rgb.c:DumpScreen2RGB"
+    }
+  },
+  "sha256": "f277902e97e8a227bbca304e4b847d4beca896d292378df0a88b988bb3e672a2",
+  "signature": {
+    "error_type": "heap-buffer-overflow",
+    "key": "READ",
+    "location": "src/util/gif2rgb.c:DumpScreen2RGB"
+  }
+}

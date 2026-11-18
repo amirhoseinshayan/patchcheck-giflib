@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0",
+  "target": "giflib",
+  "fixture": false,
+  "source": {
+    "repo": "..",
+    "base": "main",
+    "candidate": "main"
+  },
+  "builds": {
+    "release": {
+      "compiler": "gcc",
+      "flags": [
+        "-Wall",
+        "-fstack-protector-strong",
+        "-fPIE",
+        "-pie",
+        "-Wl,-z,relro,-z,now",
+        "-D_FORTIFY_SOURCE=2",
+        "-O2"
+      ],
+      "command": [
+        "{compiler}",
+        "{flags}",
+        "-Isrc/lib",
+        "-Isrc/util",
+        "src/lib/dgif_lib.c",
+        "src/lib/egif_lib.c",
+        "src/lib/gif_err.c",
+        "src/lib/gif_hash.c",
+        "src/lib/gifalloc.c",
+        "src/lib/openbsd-reallocarray.c",
+        "src/lib/quantize.c",
+        "src/util/gif2rgb.c",
+        "src/util/getarg.c",
+        "src/util/qprintf.c",
+        "-o",
+        "gif2rgb"
+      ],
+      "binary": "gif2rgb"
+    },
+    "sanitized": {
+      "compiler": "gcc",
+      "flags": [
+        "-Wall",
+        "-fstack-protector-strong",
+        "-fPIE",
+        "-pie",
+        "-Wl,-z,relro,-z,now",
+        "-O1",
+        "-g",
+        "-fno-omit-frame-pointer",
+        "-fsanitize=address,undefined"
+      ],
+      "command": [
+        "{compiler}",
+        "{flags}",
+        "-Isrc/lib",
+        "-Isrc/util",
+        "src/lib/dgif_lib.c",
+        "src/lib/egif_lib.c",
+        "src/lib/gif_err.c",
+        "src/lib/gif_hash.c",
+        "src/lib/gifalloc.c",
+        "src/lib/openbsd-reallocarray.c",
+        "src/lib/quantize.c",
+        "src/util/gif2rgb.c",
+        "src/util/getarg.c",
+        "src/util/qprintf.c",
+        "-o",
+        "gif2rgb"
+      ],
+      "binary": "gif2rgb",
+      "instrumentation": [
+        "__asan_init"
+      ]
+    },
+    "coverage": {
+      "compiler": "gcc",
+      "flags": [
+        "-Wall",
+        "-O0",
+        "-g",
+        "--coverage"
+      ],
+      "command": [
+        "{compiler}",
+        "{flags}",
+        "-Isrc/lib",
+        "-Isrc/util",
+        "src/lib/dgif_lib.c",
+        "src/lib/egif_lib.c",
+        "src/lib/gif_err.c",
+        "src/lib/gif_hash.c",
+        "src/lib/gifalloc.c",
+        "src/lib/openbsd-reallocarray.c",
+        "src/lib/quantize.c",
+        "src/util/gif2rgb.c",
+        "src/util/getarg.c",
+        "src/util/qprintf.c",
+        "-o",
+        "gif2rgb"
+      ],
+      "binary": "gif2rgb"
+    }
+  },
+  "input": {
+    "mode": "file",
+    "argv": [
+      "{binary}",
+      "-1",
+      "{input}"
+    ],
+    "cwd": "."
+  },
+  "environment": {
+    "image": "patchcheck-framework:1.0",
+    "variables": {
+      "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+      "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+    }
+  },
+  "tools": {
+    "gcc": "gcc .*",
+    "g++": "g\\+\\+ .*",
+    "readelf": "GNU readelf .*",
+    "git": "git version .*",
+    "python3": "Python 3\\..*"
+  },
+  "limits": {
+    "wall_seconds": 5,
+    "cpu_seconds": 4,
+    "memory_mb": 512,
+    "pids": 32,
+    "output_bytes": 4194304,
+    "file_bytes": 16777216,
+    "build_wall_seconds": 180
+  },
+  "tests": [
+    {
+      "id": "valid-fill",
+      "category": "valid",
+      "input": "../corpus/giflib/inputs/valid-fill.gif",
+      "oracle": "../oracles/giflib/valid-fill.json",
+      "signature": null
+    },
+    {
+      "id": "valid-margin",
+      "category": "valid",
+      "input": "../corpus/giflib/inputs/valid-margin.gif",
+      "oracle": "../oracles/giflib/valid-margin.json",
+      "signature": null
+    },
+    {
+      "id": "boundary-bg-max",
+      "category": "boundary",
+      "input": "../corpus/giflib/inputs/boundary-bg-max.gif",
+      "oracle": "../oracles/giflib/boundary-bg-max.json",
+      "signature": null
+    },
+    {
+      "id": "invalid-oversize",
+      "category": "invalid",
+      "input": "../corpus/giflib/inputs/invalid-oversize.gif",
+      "oracle": "../oracles/giflib/invalid-oversize.json",
+      "signature": null
+    },
+    {
+      "id": "invalid-zero-dim",
+      "category": "invalid",
+      "input": "../corpus/giflib/inputs/invalid-zero-dim.gif",
+      "oracle": "../oracles/giflib/invalid-zero-dim.json",
+      "signature": null
+    },
+    {
+      "id": "poc-bg-oob",
+      "category": "original",
+      "input": "../corpus/giflib/inputs/poc-bg-oob.gif",
+      "oracle": "../oracles/giflib/poc-bg-oob.json",
+      "signature": {
+        "error_type": "heap-buffer-overflow",
+        "location": "src/util/gif2rgb.c:DumpScreen2RGB",
+        "key": "READ"
+      }
+    },
+    {
+      "id": "poc-bg-far",
+      "category": "original",
+      "input": "../corpus/giflib/inputs/poc-bg-far.gif",
+      "oracle": "../oracles/giflib/poc-bg-far.json",
+      "signature": {
+        "error_type": "heap-buffer-overflow",
+        "location": "src/util/gif2rgb.c:DumpScreen2RGB",
+        "key": "READ"
+      }
+    }
+  ],
+  "corpus_dir": "../corpus/giflib/regressions",
+  "analyzers": [],
+  "minimization": {
+    "max_attempts": 400,
+    "wall_seconds": 1200
+  }
+}

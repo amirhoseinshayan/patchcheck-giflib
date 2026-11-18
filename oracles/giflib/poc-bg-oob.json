@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "source": "oracles/giflib/SPEC.md#Security property",
+    "independent": true
+  },
+  "exit_code": 1,
+  "stdout": {
+    "mode": "exact",
+    "base64": ""
+  },
+  "stderr": {
+    "mode": "exact",
+    "base64": "QmFja2dyb3VuZCBjb2xvciBvdXQgb2YgcmFuZ2UgZm9yIGNvbG9ybWFwCg=="
+  }
+}
